@@ -1,10 +1,10 @@
 {
-  "name": "react-leaflet",
-  "version": "4.2.1",
+  "name": "@someonewithpc/react-leaflet",
+  "version": "4.3.0",
   "description": "React components for Leaflet maps",
   "repository": {
     "type": "git",
-    "url": "https://github.com/PaulLeCam/react-leaflet.git"
+    "url": "git+https://github.com/someonewithpc/react-leaflet.git"
   },
   "keywords": [
     "react-component",
