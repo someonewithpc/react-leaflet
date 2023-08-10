@@ -8,6 +8,7 @@ import {
   type LatLngExpression,
   Marker as LeafletMarker,
   type MarkerOptions,
+  DomUtil,
 } from 'leaflet'
 import type { ReactNode } from 'react'
 
@@ -45,6 +46,19 @@ export const Marker = createLayerComponent<LeafletMarker, MarkerProps>(
         marker.dragging.enable()
       } else {
         marker.dragging.disable()
+      }
+    }
+    if (props.interactive != null && props.interactive !== prevProps.interactive) {
+      marker.options.interactive = props.interactive;
+      const el = marker.getElement();
+      if (el) {
+        if (props.interactive === true) {
+          DomUtil.addClass(el, 'leaflet-interactive');
+          marker.addInteractiveTarget(el);
+        } else {
+          DomUtil.removeClass(el, 'leaflet-interactive');
+          marker.removeInteractiveTarget(el);
+        }
       }
     }
   },
