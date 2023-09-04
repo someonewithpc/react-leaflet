@@ -53,6 +53,7 @@ export interface ControlledLayerProps {
   checked?: boolean
   children: ReactNode
   name: string
+  extra?: Record<string, any>
 }
 
 export function CustomizableLayersControl<T extends Control.Layers>(
@@ -64,33 +65,38 @@ export function CustomizableLayersControl<T extends Control.Layers>(
   Overlay: FunctionComponent<ControlledLayerProps>
 } {
   return Object.assign(createContainerComponent(useLayersControl(klass)), {
-    BaseLayer: createControlledLayer(function addBaseLayer(
-      layersControl: Control.Layers,
+    BaseLayer: createControlledLayer<T>(function addBaseLayer(
+      layersControl: T,
       layer: Layer,
       name: string,
+      extra: Record<string, any> | undefined,
     ) {
-      layersControl.addBaseLayer(layer, name)
+      // @ts-ignore
+      layersControl.addBaseLayer(layer, name, extra)
     }),
 
-    Overlay: createControlledLayer(function addOverlay(
-      layersControl: Control.Layers,
+    Overlay: createControlledLayer<T>(function addOverlay(
+      layersControl: T,
       layer: Layer,
       name: string,
+      extra: Record<string, any> | undefined,
     ) {
-      layersControl.addOverlay(layer, name)
+      // @ts-ignore
+      layersControl.addOverlay(layer, name, extra)
     }),
   })
 }
 
 export const LayersControl = CustomizableLayersControl(Control.Layers)
 
-type AddLayerFunc = (
-  layersControl: Control.Layers,
+type AddLayerFunc<T extends Control.Layers> = (
+  layersControl: T,
   layer: Layer,
   name: string,
+  extra: Record<string, any>,
 ) => void
 
-export function createControlledLayer(addLayerToControl: AddLayerFunc) {
+export function createControlledLayer<T extends Control.Layers>(addLayerToControl: AddLayerFunc<T>) {
   return function ControlledLayer(props: ControlledLayerProps) {
     const parentContext = useLeafletContext()
     const propsRef = useRef<ControlledLayerProps>(props)
@@ -103,7 +109,13 @@ export function createControlledLayer(addLayerToControl: AddLayerFunc) {
           if (propsRef.current.checked) {
             map.addLayer(layerToAdd)
           }
-          addLayerToControl(layersControl, layerToAdd, propsRef.current.name)
+          addLayerToControl(
+            // @ts-ignore TS2345
+            layersControl,
+            layerToAdd,
+            propsRef.current.name,
+            propsRef.current.extra,
+          )
           setLayer(layerToAdd)
         }
       },
